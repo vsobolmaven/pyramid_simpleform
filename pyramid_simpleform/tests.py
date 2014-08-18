@@ -102,6 +102,37 @@ class TestFormencodeForm(unittest.TestCase):
         form.errors = [u"Name is missing"]
         self.assert_(form.all_errors() == [u"Name is missing"])
 
+    def test_ok_with_jsonbody(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        
+        import json
+        request.json_body = json.loads('{"name" : "ok"}')
+        
+        form = Form(request, SimpleFESchema)
+        self.assert_(form.validate())
+
+    def test_error_with_jsonbody(self):
+
+        from pyramid_simpleform import Form
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        
+        import json
+        request.json_body = json.loads('{}')
+        
+        form = Form(request, SimpleFESchema)
+        form.errors = {"name" : [u"Name is missing"],
+                       "value" : u"Value is missing"}
+        self.assert_(sorted(form.all_errors()) == sorted([
+            u"Name is missing", 
+            u"Value is missing"]))
+
+        
     def test_all_errors_with_dict(self):
 
         from pyramid_simpleform import Form
@@ -179,6 +210,24 @@ class TestFormencodeForm(unittest.TestCase):
         self.assert_(form.is_error('name'))
 
         self.assert_(form.errors_for('name') == ['Please enter a value'])
+
+    def test_foreach_with_validators_and_multidict(self):
+        from formencode import ForEach
+        from pyramid_simpleform import Form
+        from webob.multidict import MultiDict
+
+        request = testing.DummyRequest()
+        request.method = "POST"
+        request.POST = MultiDict([
+            ("name", "1"),
+            ("name", "2"),
+            ("name", "3"),
+        ])
+
+        form = Form(request,
+                    validators=dict(name=ForEach(validators.NotEmpty())))
+        self.assert_(form.validate())
+        self.assertListEqual(form.data["name"], ["1", "2", "3"])
 
     def test_is_validated_on_post(self):
         from pyramid_simpleform import Form
