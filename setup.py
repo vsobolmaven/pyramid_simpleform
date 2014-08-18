@@ -17,7 +17,7 @@ requires = [
 ]
 
 setup(name='pyramid_simpleform',
-      version='0.7.vsobol',
+      version='0.7.1.vsobol',
       description='pyramid_simpleform',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
