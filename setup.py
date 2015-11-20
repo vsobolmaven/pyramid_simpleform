@@ -20,7 +20,7 @@ tests_require = requires + [
 ]
 
 setup(name='pyramid_simpleform',
-      version='0.7.1.vsobol',
+      version='0.7.2.vsobol',
       description='pyramid_simpleform',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
